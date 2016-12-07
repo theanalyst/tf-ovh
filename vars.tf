@@ -17,3 +17,6 @@ variable "master_ip" {
 variable "login_user" {
   "default" = "root"
 }
+variable "minion_count" {
+  "default" = "3"
+}

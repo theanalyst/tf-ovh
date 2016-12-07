@@ -25,8 +25,8 @@ resource "openstack_compute_instance_v2" "salt-master" {
 }
 
 resource "openstack_compute_instance_v2" "salt-minion" {
-  count = "1"
-  name = "${var.vm_name_prefix}-salt-master"
+  count = "${var.minion_count}"
+  name = "${var.vm_name_prefix}-salt-minion-${count.index}"
   key_pair = "${var.key_pair}"
   image_name = "${var.image_name}"
   flavor_name = "${var.master_flavor}"
@@ -40,6 +40,7 @@ resource "openstack_compute_instance_v2" "salt-minion" {
   provisioner "remote-exec" {
     inline = [
       "zypper --quiet --non-interactive in salt-minion",
+      "echo ${self.name} > /etc/salt/minion_id", # all names are sles.suse.de otherwise :/
       "echo \"master: ${var.master_ip}\" > /etc/salt/minion.d/minion.conf",
       "ip addr add ${self.network.1.fixed_ip_v4}/24 dev eth1",
       "ip link set eth1 up",
@@ -52,4 +53,12 @@ resource "openstack_compute_instance_v2" "salt-minion" {
       agent = true
     }
   }
+}
+
+output "master-ip" {
+  value = "${openstack_compute_instance_v2.salt-master.0.access_ip_v4}"
+}
+
+output "minion_ips" {
+  value = "${join(" ", openstack_compute_instance_v2.salt-minion.*.access_ip_v4)}"
 }
