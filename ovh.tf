@@ -8,6 +8,12 @@ data "template_file" "master-bootstrap" {
   }
 }
 
+resource "openstack_blockstorage_volume_v2" "minion-blk" {
+  count = "${var.minion_count}",
+  size = "${var.minion_block_size}"
+  name = "${var.vm_name_prefix}-${var.minion_block_name}${count.index}"
+}
+
 resource "openstack_compute_instance_v2" "salt-master" {
   count = "1"
   name = "${var.vm_name_prefix}-salt-master"
@@ -38,6 +44,9 @@ resource "openstack_compute_instance_v2" "salt-minion" {
   network {
     name = "VLAN"
   }
+  # Ideally we'd love to use template user-data here, however
+  # tf prevents the use of self vars in template, we'd have to come up
+  # with fixed vm ips otherwise
   provisioner "remote-exec" {
     inline = [
       "zypper --quiet --non-interactive in salt-minion",
@@ -53,6 +62,10 @@ resource "openstack_compute_instance_v2" "salt-minion" {
       user = "${var.login_user}"
       agent = true
     }
+  }
+
+  volume {
+    volume_id = "${element(openstack_blockstorage_volume_v2.minion-blk.*.id, count.index)}"
   }
 }
 

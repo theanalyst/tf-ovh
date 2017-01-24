@@ -14,9 +14,22 @@ variable "vm_name_prefix" {
 variable "master_ip" {
   "default" = "192.168.2.10"
 }
+
+variable "minion_ip" {
+  "default" = "192.168.2.101"
+}
+
 variable "login_user" {
   "default" = "root"
 }
 variable "minion_count" {
   "default" = "3"
+}
+
+variable "minion_block_size" {
+  "default" = "10"
+}
+
+variable "minion_block_name" {
+  "default" = "osd."
 }
