@@ -4,6 +4,7 @@ data "template_file" "master-bootstrap" {
   template = "${file("master-bootstrap.tpl")}"
   vars {
     master_ip = "${var.master_ip}"
+    prefix = "${var.vm_name_prefix}"
   }
 }
 
