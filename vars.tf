@@ -11,8 +11,12 @@ variable "vm_name_prefix" {
   "default" = "tf"
 }
 # this should be in the same subnet you create in vRACK
+variable "master_subnet" {
+  "default" = "192.168.2.0/24"
+}
+
 variable "master_ip" {
-  "default" = "192.168.2.10"
+  "default" = "10"
 }
 
 variable "minion_ip" {
@@ -23,7 +27,7 @@ variable "login_user" {
   "default" = "root"
 }
 variable "minion_count" {
-  "default" = "3"
+  "default" = "4"
 }
 
 variable "minion_block_size" {
