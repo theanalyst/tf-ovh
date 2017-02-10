@@ -18,11 +18,33 @@ data "template_file" "minion-bootstrap" {
   }
 }
 
-
 resource "openstack_blockstorage_volume_v2" "minion-blk" {
   count = "${var.minion_count}",
   size = "${var.minion_block_size}"
   name = "${var.vm_name_prefix}-${var.minion_block_name}${count.index}"
+}
+
+resource "openstack_networking_secgroup_v2" "ssh-http" {
+  name = "ssh-http"
+  description = "allow only ssh and sec. group traffic from outside"
+}
+
+resource "openstack_networking_secgroup_rule_v2" "ssh" {
+  direction = "ingress"
+  ethertype = "IPv4"
+  protocol = "tcp"
+  port_range_min = 22
+  port_range_max = 22
+  security_group_id = "${openstack_networking_secgroup_v2.ssh-http.id}"
+}
+
+resource "openstack_networking_secgroup_rule_v2" "http" {
+  direction = "ingress"
+  ethertype = "IPv4"
+  protocol = "tcp"
+  port_range_min = 80
+  port_range_max = 80
+  security_group_id = "${openstack_networking_secgroup_v2.ssh-http.id}"
 }
 
 resource "openstack_compute_instance_v2" "salt-master" {
@@ -31,6 +53,8 @@ resource "openstack_compute_instance_v2" "salt-master" {
   key_pair = "${var.key_pair}"
   image_name = "${var.image_name}"
   flavor_name = "${var.master_flavor}"
+  security_groups = ["ssh-http"]
+
   network  {
     name = "Ext-Net"
     access_network = true
@@ -48,6 +72,8 @@ resource "openstack_compute_instance_v2" "salt-minion" {
   key_pair = "${var.key_pair}"
   image_name = "${var.image_name}"
   flavor_name = "${var.master_flavor}"
+  security_groups = ["ssh-http"]
+
   network  {
     name = "Ext-Net"
     access_network = true
