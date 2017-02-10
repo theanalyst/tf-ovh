@@ -27,3 +27,7 @@ echo "autosign_file: /etc/salt/autosign_hosts.conf" > /etc/salt/master.d/autosig
 echo "*" > /etc/salt/autosign_hosts.conf
 systemctl start salt-master.service
 systemctl start salt-minion.service
+if ! rpm -q --last kernel-default | head -1 | grep -q $(uname -r | awk -F '-d' '{print $1}')
+then
+    reboot
+fi
