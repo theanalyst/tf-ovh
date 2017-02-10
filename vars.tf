@@ -37,3 +37,15 @@ variable "minion_block_size" {
 variable "minion_block_name" {
   "default" = "osd."
 }
+
+variable "deepsea_install_from_git" {
+  "default" = "false"
+}
+
+variable "deepsea_git_remote" {
+  "default" = "git://github.com/SUSE/DeepSea"
+}
+
+variable "deepsea_ref" {
+  "default" = "master"
+}

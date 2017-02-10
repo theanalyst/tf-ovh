@@ -5,6 +5,9 @@ data "template_file" "master-bootstrap" {
   vars {
     master_ip = "${cidrhost(var.master_subnet, var.master_ip)}"
     prefix = "${var.vm_name_prefix}"
+    deepsea_install_from_git = "${var.deepsea_install_from_git}"
+    deepsea_git_remote = "${var.deepsea_git_remote}"
+    deepsea_ref = "${var.deepsea_ref}"
   }
 }
 

@@ -16,11 +16,19 @@ sudo ip link set eth1 up
 
 
 sudo zypper --non-interactive up kernel-default
-sudo zypper --non-interactive in salt-master salt-minion
+sudo zypper --non-interactive in salt-master salt-minion git-core make
 systemctl enable salt-master.service
 systemctl enable salt-minion.service
-sudo zypper --non-interactive in deepsea
-sed -i 's/.localdomain//' /srv/pillar/ceph/master_minion.sls
+
+if $deepsea_install_from_git
+then
+    cd ~ && git clone $deepsea_git_remote
+    cd $deepsea && git checkout $deepsea_ref && sudo make install
+else
+    sudo zypper --non-interactive in deepsea
+fi
+echo "master_minion: ${prefix}-salt-master" > /srv/pillar/ceph/master_minion.sls
+#sed -i 's/.localdomain//' /srv/pillar/ceph/master_minion.sls
 echo "${prefix}-salt-master" > /etc/salt/minion_id
 echo "master: ${master_ip}" > /etc/salt/minion.d/minion.conf
 echo "autosign_file: /etc/salt/autosign_hosts.conf" > /etc/salt/master.d/autosign.conf
