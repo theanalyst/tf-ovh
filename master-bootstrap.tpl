@@ -15,8 +15,8 @@ sudo ip addr add ${master_ip}/24 dev eth1
 sudo ip link set eth1 up
 
 
-sudo zypper --non-interactive up kernel-default
-sudo zypper --non-interactive in salt-master salt-minion git-core make
+sudo zypper ref && sudo zypper --non-interactive up
+sudo zypper --non-interactive in salt-master salt-minion
 systemctl enable salt-master.service
 systemctl enable salt-minion.service
 

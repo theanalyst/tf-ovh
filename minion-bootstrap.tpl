@@ -18,7 +18,7 @@ echo ${node_name} > /etc/salt/minion_id
 echo "master: ${master_ip}" > /etc/salt/minion.d/minion.conf
 systemctl enable salt-minion
 systemctl start salt-minion
-zypper ref && zypper -n up kernel-default
+zypper ref && zypper -n up
 current=`uname -r`
 if ! rpm -q --last kernel-default | head -1 | grep -q $(uname -r | awk -F '-d' '{print $1}')
 then
