@@ -27,7 +27,8 @@ then
     git checkout ${deepsea_ref}
     mkdir -p ~/rpmbuild/SOURCES/ ~/rpmbuild/RPMS
     echo "%_topdir %{getenv:HOME}/rpmbuild" > ~/.rpmmacros
-    make install && make rpm
+    #make install && make rpm
+    make tarball && rpmbuild --define '_topdir /root/rpmbuild' -bb deepsea.spec
     cd ~/rpmbuild/RPMS/noarch && rpm -iF deepsea*.rpm && touch done
 else
     sudo zypper --non-interactive in deepsea
