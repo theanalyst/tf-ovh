@@ -22,7 +22,7 @@ data "template_file" "minion-bootstrap" {
 }
 
 resource "openstack_blockstorage_volume_v2" "minion-blk" {
-  count = "${var.minion_count}",
+  count = "${var.minion_count * var.minion_block_count}",
   size = "${var.minion_block_size}"
   name = "${var.vm_name_prefix}-${var.minion_block_name}${count.index}"
 }
@@ -85,12 +85,16 @@ resource "openstack_compute_instance_v2" "salt-minion" {
     name = "VLAN"
     fixed_ip_v4 = "${cidrhost(var.master_subnet, var.master_ip + count.index+100)}"
   }
-  volume {
-    volume_id = "${element(openstack_blockstorage_volume_v2.minion-blk.*.id, count.index)}"
-  }
 
   user_data = "${element(data.template_file.minion-bootstrap.*.rendered,count.index)}"
 
+}
+
+resource "openstack_compute_volume_attach_v2" "salt-minion-attach" {
+  #block_count = "${var.minion_block_count}"
+  count = "${var.minion_count * var.minion_block_count}"
+  instance_id = "${element(openstack_compute_instance_v2.salt-minion.*.id, count.index / var.minion_block_count)}"
+  volume_id = "${element(openstack_blockstorage_volume_v2.minion-blk.*.id, count.index)}"
 }
 
 output "master-ip" {
