@@ -19,10 +19,6 @@ variable "master_ip" {
   "default" = "10"
 }
 
-variable "minion_ip" {
-  "default" = "192.168.2.101"
-}
-
 variable "login_user" {
   "default" = "root"
 }
@@ -36,6 +32,10 @@ variable "minion_block_size" {
 
 variable "minion_block_name" {
   "default" = "osd."
+}
+
+variable "minion_block_count" {
+  "default" = "2"
 }
 
 variable "deepsea_install_from_git" {
