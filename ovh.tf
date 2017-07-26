@@ -27,29 +27,6 @@ resource "openstack_blockstorage_volume_v2" "minion-blk" {
   name = "${var.vm_name_prefix}-${var.minion_block_name}${count.index}"
 }
 
-resource "openstack_networking_secgroup_v2" "ssh-http" {
-  name = "ssh-http"
-  description = "allow only ssh and sec. group traffic from outside"
-}
-
-resource "openstack_networking_secgroup_rule_v2" "ssh" {
-  direction = "ingress"
-  ethertype = "IPv4"
-  protocol = "tcp"
-  port_range_min = 22
-  port_range_max = 22
-  security_group_id = "${openstack_networking_secgroup_v2.ssh-http.id}"
-}
-
-resource "openstack_networking_secgroup_rule_v2" "http" {
-  direction = "ingress"
-  ethertype = "IPv4"
-  protocol = "tcp"
-  port_range_min = 80
-  port_range_max = 80
-  security_group_id = "${openstack_networking_secgroup_v2.ssh-http.id}"
-}
-
 resource "openstack_compute_instance_v2" "salt-master" {
   count = "1"
   name = "${var.vm_name_prefix}-salt-master"
@@ -64,7 +41,6 @@ resource "openstack_compute_instance_v2" "salt-master" {
   }
   network {
     name = "VLAN"
-    fixed_ip_v4 = "${cidrhost(var.master_subnet, var.master_ip)}"
   }
   user_data = "${data.template_file.master-bootstrap.rendered}"
 }
@@ -83,7 +59,6 @@ resource "openstack_compute_instance_v2" "salt-minion" {
   }
   network {
     name = "VLAN"
-    fixed_ip_v4 = "${cidrhost(var.master_subnet, var.master_ip + count.index+100)}"
   }
 
   user_data = "${element(data.template_file.minion-bootstrap.*.rendered,count.index)}"
