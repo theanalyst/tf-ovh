@@ -12,6 +12,7 @@ STARTMODE='auto'
 EOF
 ip addr add ${minion_ip}/24 dev eth1
 ip link set eth1 up
+sed -i 's/\.localdomain//g' /etc/hosts
 zypper --non-interactive up kernel-default
 zypper --quiet --non-interactive in salt-minion
 echo ${node_name} > /etc/salt/minion_id
